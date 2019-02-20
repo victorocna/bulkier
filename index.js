@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const Jimp = require('jimp')
+const compare = require('./lib/compare.js')
 const walk = require('./lib/walk.js')
 const argv = require('yargs-parser')(process.argv.slice(2))
 
@@ -25,7 +26,14 @@ walk(options.dir, (err, files) => {
   let items = 0
   const images = files.filter(isImage)
   images.map(async image => {
-    await optimize(image, options.quality, path.join(options.dest, image.substring(__dirname.length - 1)))
+    const optimized = path.join(options.dest, image.substring(__dirname.length - 1))
+    await optimize(image, options.quality, optimized)
+
+    if (compare.isWorse(image, optimized)) {
+      fs.copyFile(image, optimized, (err) => {
+        if (err) throw err
+      })
+    }
 
     items++
     if (images.length > 0 && items === images.length) {
@@ -48,10 +56,3 @@ const optimize = async (image, quality, destination) => {
 
 const done = () => console.log('👍')
 const isImage = (file) => new RegExp('.+(jpe?g|png|gif)', 'gi').test(file)
-
-const imageSize = (image, cb) => {
-  fs.stat(image, (err, stats) => {
-    if (err) return cb(err)
-    cb(null, stats.size)
-  })
-}
