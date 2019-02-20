@@ -29,7 +29,7 @@ walk(options.dir, (err, files) => {
     const optimized = path.join(options.dest, image.substring(__dirname.length - 1))
     await optimize(image, options.quality, optimized)
 
-    if (compare.isWorse(image, optimized)) {
+    if (await compare.isWorse(image, optimized)) {
       fs.copyFile(image, optimized, (err) => {
         if (err) throw err
       })
