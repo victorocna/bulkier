@@ -1,14 +1,20 @@
 const fs = require('fs')
 const path = require('path')
 const Jimp = require('jimp')
-const compare = require('./lib/compare.js')
 const walk = require('./lib/walk.js')
 const utils = require('./lib/utils.js')
 const argv = require('yargs-parser')(process.argv.slice(2))
 
+const breakpoints = [
+  576, //sm
+  768, //md
+  992, //lg
+  1200, //xl
+]
 const options = {
   dir: path.resolve('images'),
   dest: path.resolve('build'),
+  skipSmaller: false,
   quality: 75,
   ...argv,
 }
@@ -26,27 +32,30 @@ walk(options.dir, (err, files) => {
 
   const images = files.filter(utils.isImage)
   images.map(async image => {
-    const optimized = path.join(options.dest, image.substring(__dirname.length - 1))
-    await optimize(image, options.quality, optimized)
-
-    if (await compare.isWorse(image, optimized)) {
-      fs.copyFile(image, optimized, (err) => {
-        if (err) throw err
-      })
-    }
+    options.path = path.join(options.dest, image.substring(__dirname.length - 1))
+    breakpoints.map(async width => await resize(image, width, options))
   })
 })
 
-const optimize = async (imagePath, quality, destination) => {
+const resize = async (imagePath, desiredWidth, options) => {
+  const writePath = options.path
   return Jimp.read(imagePath)
     .then(image => {
-      utils.markProgress()
+      if (image.getWidth() <= desiredWidth) {
+        if (options.skipSmaller) {
+          return
+        }
+        desiredWidth = image.getWidth()
+      }
 
+      utils.markProgress()
       return image
-        .quality(quality)
-        .writeAsync(destination)
+        .resize(desiredWidth, Jimp.AUTO)
+        .quality(options.quality)
+        .writeAsync(utils.uniquePath(writePath, desiredWidth))
     })
     .catch(err => {
       console.error(err)
+      process.exit(1)
     })
 }

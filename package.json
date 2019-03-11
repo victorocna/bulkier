@@ -4,6 +4,8 @@
   "description": "Bulk image optimization with Node.js",
   "main": "index.js",
   "scripts": {
+    "optimize": "node index.js",
+    "resize": "node resize.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
