@@ -1,13 +1,13 @@
-const fs = require('fs')
-const path = require('path')
-const Jimp = require('jimp')
-const walk = require('./lib/walk.js')
-const utils = require('./lib/utils.js')
-const argv = require('yargs-parser')(process.argv.slice(2))
+const fs = require("fs")
+const path = require("path")
+const Jimp = require("jimp")
+const walk = require("./lib/walk.js")
+const utils = require("./lib/utils.js")
+const argv = require("yargs-parser")(process.argv.slice(2))
 
 const options = {
-  dir: path.resolve('images'),
-  dest: path.resolve('build'),
+  dir: path.resolve("images"),
+  dest: path.resolve("build"),
   skipSmaller: false,
   quality: 75,
   ...argv,
@@ -22,7 +22,9 @@ try {
 }
 
 walk(options.dir, (err, files) => {
-  if (err) throw err;
+  if (err) {
+    throw err
+  }
 
   const breakpoints = {
     576: "small",
@@ -32,18 +34,18 @@ walk(options.dir, (err, files) => {
   }
 
   const images = files.filter(utils.isImage)
-  images.map(async image => {
+  images.map(async (image) => {
     options.path = path.join(options.dest, image.substring(__dirname.length - 1))
     options.breakpoints = breakpoints
 
-    Object.keys(breakpoints).map(async width => await resize(image, +width, options))
+    Object.keys(breakpoints).map(async (width) => await resize(image, +width, options))
   })
 })
 
 const resize = async (imagePath, width, options) => {
   const writePath = options.path
   return Jimp.read(imagePath)
-    .then(image => {
+    .then((image) => {
       if (image.getWidth() <= width) {
         if (options.skipSmaller) {
           return
@@ -62,7 +64,7 @@ const resize = async (imagePath, width, options) => {
         .quality(options.quality)
         .writeAsync(utils.uniquePath(writePath, suffix))
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err)
       process.exit(1)
     })

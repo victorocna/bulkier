@@ -1,14 +1,14 @@
-const fs = require('fs')
-const path = require('path')
-const Jimp = require('jimp')
-const compare = require('./lib/compare.js')
-const walk = require('./lib/walk.js')
-const utils = require('./lib/utils.js')
-const argv = require('yargs-parser')(process.argv.slice(2))
+const fs = require("fs")
+const path = require("path")
+const Jimp = require("jimp")
+const compare = require("./lib/compare.js")
+const walk = require("./lib/walk.js")
+const utils = require("./lib/utils.js")
+const argv = require("yargs-parser")(process.argv.slice(2))
 
 const options = {
-  dir: path.resolve('images'),
-  dest: path.resolve('build'),
+  dir: path.resolve("images"),
+  dest: path.resolve("build"),
   quality: 75,
   ...argv,
 }
@@ -22,10 +22,10 @@ try {
 }
 
 walk(options.dir, (err, files) => {
-  if (err) throw err;
+  if (err) throw err
 
   const images = files.filter(utils.isImage)
-  images.map(async image => {
+  images.map(async (image) => {
     const optimized = path.join(options.dest, image.substring(__dirname.length - 1))
     await optimize(image, options.quality, optimized)
 
@@ -39,14 +39,12 @@ walk(options.dir, (err, files) => {
 
 const optimize = async (imagePath, quality, destination) => {
   return Jimp.read(imagePath)
-    .then(image => {
+    .then((image) => {
       utils.markProgress()
 
-      return image
-        .quality(quality)
-        .writeAsync(destination)
+      return image.quality(quality).writeAsync(destination)
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err)
     })
 }
