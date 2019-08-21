@@ -5,12 +5,6 @@ const walk = require('./lib/walk.js')
 const utils = require('./lib/utils.js')
 const argv = require('yargs-parser')(process.argv.slice(2))
 
-const breakpoints = [
-  576, //sm
-  768, //md
-  992, //lg
-  1200, //xl
-]
 const options = {
   dir: path.resolve('images'),
   dest: path.resolve('build'),
@@ -30,29 +24,43 @@ try {
 walk(options.dir, (err, files) => {
   if (err) throw err;
 
+  const breakpoints = {
+    576: "small",
+    768: "medium",
+    992: "large",
+    1200: "xlarge",
+  }
+
   const images = files.filter(utils.isImage)
   images.map(async image => {
     options.path = path.join(options.dest, image.substring(__dirname.length - 1))
-    breakpoints.map(async width => await resize(image, width, options))
+    options.breakpoints = breakpoints
+
+    Object.keys(breakpoints).map(async width => await resize(image, +width, options))
   })
 })
 
-const resize = async (imagePath, desiredWidth, options) => {
+const resize = async (imagePath, width, options) => {
   const writePath = options.path
   return Jimp.read(imagePath)
     .then(image => {
-      if (image.getWidth() <= desiredWidth) {
+      if (image.getWidth() <= width) {
         if (options.skipSmaller) {
           return
         }
-        desiredWidth = image.getWidth()
+        width = image.getWidth()
+      }
+
+      let suffix = width
+      if (options.breakpoints && options.breakpoints[width]) {
+        suffix = options.breakpoints[width]
       }
 
       utils.markProgress()
       return image
-        .resize(desiredWidth, Jimp.AUTO)
+        .resize(width, Jimp.AUTO)
         .quality(options.quality)
-        .writeAsync(utils.uniquePath(writePath, desiredWidth))
+        .writeAsync(utils.uniquePath(writePath, suffix))
     })
     .catch(err => {
       console.error(err)
