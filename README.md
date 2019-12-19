@@ -21,3 +21,5 @@ Resize images
 ```bash
 npm run resize -- --dir=D:/Deskop/icons --quality=60
 ```
+
+**Important note!** For both commands, please use forward slashes when specifying the folder you wish to process.
