@@ -13,11 +13,30 @@
   "repository": "git://github.com/victorocna/bulkier.git",
   "license": "MIT",
   "dependencies": {
-    "jimp": "^0.6.0",
-    "yargs-parser": "^13.0.0"
+    "jimp": "^0.10.1",
+    "yargs-parser": "^13.1.2"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.2",
-    "eslint": "^6.2.1"
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "commonjs": true,
+      "es6": true,
+      "node": true
+    },
+    "extends": "eslint:recommended",
+    "parser": "babel-eslint",
+    "rules": {
+      "no-warning-comments": "warn"
+    }
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": false,
+    "arrowParens": "always"
   }
 }
