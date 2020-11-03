@@ -22,4 +22,10 @@ Resize images
 npm run resize -- --dir=D:/Deskop/icons --quality=60
 ```
 
+Rename images
+
+```bash
+npm run rename -- --dir=D:/Deskop/icons --prefix=awesome-website
+```
+
 **Important note!** For both commands, please use forward slashes when specifying the folder you wish to process.
