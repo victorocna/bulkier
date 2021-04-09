@@ -3,6 +3,7 @@ const path = require('path');
 const Jimp = require('jimp');
 const walk = require('./lib/walk.js');
 const utils = require('./lib/utils.js');
+const breakpoints = require('./breakpoints');
 const config = require('./config');
 
 try {
@@ -12,29 +13,22 @@ try {
   process.exit(1);
 }
 
-walk(config.source, (err, files) => {
-  if (err) {
-    throw err;
-  }
+const run = async () => {
+  for await (const file of walk(config.source)) {
+    if (!utils.isImage(file)) {
+      return false;
+    }
 
-  const breakpoints = {
-    576: 'small',
-    768: 'medium',
-    992: 'large',
-    1200: 'xlarge',
-    1920: 'full-hd',
-    3840: 'ultra-4k',
-  };
-
-  const images = files.filter(utils.isImage);
-  images.map(async (image) => {
-    const filename = path.basename(image);
+    const filename = path.basename(file);
     config.path = path.join(config.destination, filename);
     config.breakpoints = breakpoints;
 
-    Object.keys(breakpoints).map(async (width) => await resize(image, +width, config));
-  });
-});
+    for (const width of Object.keys(breakpoints)) {
+      await resize(file, +width, config);
+    }
+  }
+};
+run();
 
 const resize = async (imagePath, width, options) => {
   const writePath = options.path;

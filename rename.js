@@ -13,22 +13,24 @@ try {
   process.exit(1);
 }
 
-walk(config.source, (err, files) => {
-  if (err) throw err;
+const run = async () => {
+  for await (const file of walk(config.source)) {
+    if (!utils.isImage(file)) {
+      return false;
+    }
 
-  const images = files.filter(utils.isImage);
-  images.map(async (image) => {
     const imageParts = {
       prefix: config.prefix,
       name: hash(),
     };
     const imageSlug = slug(Object.values(imageParts).join(' '), { lower: true });
 
-    const renamed = imageSlug + path.extname(image);
+    const renamed = imageSlug + path.extname(file);
     const dest = path.join(config.destination, renamed);
 
-    fs.copyFile(image, dest, (err) => {
+    fs.copyFile(file, dest, (err) => {
       if (err) throw err;
     });
-  });
-});
+  }
+};
+run();

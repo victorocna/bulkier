@@ -13,22 +13,24 @@ try {
   process.exit(1);
 }
 
-walk(config.source, (err, files) => {
-  if (err) throw err;
+const run = async () => {
+  for await (const file of walk(config.source)) {
+    if (!utils.isImage(file)) {
+      return false;
+    }
 
-  const images = files.filter(utils.isImage);
-  images.map(async (image) => {
-    const filename = path.basename(image);
+    const filename = path.basename(file);
     const optimized = path.join(config.destination, filename);
-    await optimize(image, config.quality, optimized);
+    await optimize(file, config.quality, optimized);
 
-    if (await compare.isWorse(image, optimized)) {
-      fs.copyFile(image, optimized, (err) => {
+    if (await compare.isWorse(file, optimized)) {
+      fs.copyFile(file, optimized, (err) => {
         if (err) throw err;
       });
     }
-  });
-});
+  }
+};
+run();
 
 const optimize = async (imagePath, quality, destination) => {
   return Jimp.read(imagePath)
