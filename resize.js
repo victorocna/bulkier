@@ -1,19 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 const Jimp = require('jimp');
-const walk = require('./lib/walk.js');
-const utils = require('./lib/utils.js');
+const walk = require('./lib/walk');
+const utils = require('./lib/utils');
 const breakpoints = require('./breakpoints');
 const config = require('./config');
 
-try {
-  fs.lstatSync(config.source);
-} catch (err) {
-  console.error(`Error: no such file or directory ${config.source}`);
-  process.exit(1);
-}
-
 const run = async () => {
+  // throws if source and destination do not exist
+  fs.lstatSync(config.source).isDirectory();
+  fs.lstatSync(config.destination).isDirectory();
+
+  // async read files in source folder
   for await (const file of walk(config.source)) {
     if (!utils.isImage(file)) {
       return false;
