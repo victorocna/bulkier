@@ -3,25 +3,16 @@ const path = require('path');
 const Jimp = require('jimp');
 const walk = require('./lib/walk.js');
 const utils = require('./lib/utils.js');
-const argv = require('yargs-parser')(process.argv.slice(2));
-
-const options = {
-  dir: path.resolve('images'),
-  dest: path.resolve('build'),
-  skipSmaller: false,
-  quality: 75,
-  ...argv,
-};
-options.dir = path.resolve(__dirname, options.dir);
+const config = require('./config');
 
 try {
-  fs.lstatSync(options.dir);
+  fs.lstatSync(config.source);
 } catch (err) {
-  console.error(`Error: no such file or directory ${options.dir}`);
+  console.error(`Error: no such file or directory ${config.source}`);
   process.exit(1);
 }
 
-walk(options.dir, (err, files) => {
+walk(config.source, (err, files) => {
   if (err) {
     throw err;
   }
@@ -37,10 +28,11 @@ walk(options.dir, (err, files) => {
 
   const images = files.filter(utils.isImage);
   images.map(async (image) => {
-    options.path = path.join(options.dest, image.substring(__dirname.length - 1));
-    options.breakpoints = breakpoints;
+    const filename = path.basename(image);
+    config.path = path.join(config.destination, filename);
+    config.breakpoints = breakpoints;
 
-    Object.keys(breakpoints).map(async (width) => await resize(image, +width, options));
+    Object.keys(breakpoints).map(async (width) => await resize(image, +width, config));
   });
 });
 

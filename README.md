@@ -10,22 +10,22 @@ Install dependencies
 npm install
 ```
 
-Optimize images
+Copy the example config and configure it
 
 ```bash
-npm run optimize -- --dir=D:/Deskop/icons --quality=60
+cp .env.example .env
+# update .env file according to your needs
 ```
 
-Resize images
+After you have configured the project you can choose between these options
 
 ```bash
-npm run resize -- --dir=D:/Deskop/icons --quality=60
+# Optimize images
+npm run optimize
+
+# Resize images
+npm run resize
+
+# Rename images
+npm run rename
 ```
-
-Rename images
-
-```bash
-npm run rename -- --dir=D:/Deskop/icons --prefix=awesome-website
-```
-
-**Important note!** For both commands, please use forward slashes when specifying the folder you wish to process.

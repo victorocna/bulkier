@@ -4,37 +4,28 @@ const slug = require('slug');
 const hash = require('./lib/random-hash');
 const walk = require('./lib/walk.js');
 const utils = require('./lib/utils.js');
-const argv = require('yargs-parser')(process.argv.slice(2));
-
-const options = {
-  dir: path.resolve('images'),
-  dest: path.resolve('build'),
-  prefix: '',
-  ...argv,
-};
-options.dir = path.resolve(__dirname, options.dir);
+const config = require('./config');
 
 try {
-  fs.lstatSync(options.dir);
+  fs.lstatSync(config.source);
 } catch (err) {
-  console.error(`Error: no such file or directory ${options.dir}`);
+  console.error(`Error: no such file or directory ${config.source}`);
   process.exit(1);
 }
 
-walk(options.dir, (err, files) => {
+walk(config.source, (err, files) => {
   if (err) throw err;
 
   const images = files.filter(utils.isImage);
   images.map(async (image) => {
     const imageParts = {
+      prefix: config.prefix,
       name: hash(),
-      folder: path.dirname(image).split('\\').reverse()[0],
-      prefix: options.prefix,
     };
-    const imageSlug = slug(Object.values(imageParts).reverse().join(' '), { lower: true });
+    const imageSlug = slug(Object.values(imageParts).join(' '), { lower: true });
 
     const renamed = imageSlug + path.extname(image);
-    const dest = path.join(options.dest, renamed);
+    const dest = path.join(config.destination, renamed);
 
     fs.copyFile(image, dest, (err) => {
       if (err) throw err;
