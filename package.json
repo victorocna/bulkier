@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.0.3",
-    "jimp": "^0.16.2",
+    "jimp": "^0.22.7",
     "jpeg-js": "^0.4.4",
     "slug": "^8.2.2"
   },
