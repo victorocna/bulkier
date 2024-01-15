@@ -7,6 +7,7 @@
     "optimize": "node index.js",
     "rename": "node rename.js",
     "resize": "node resize.js",
+    "tiktok": "node tiktok.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.0.3",
+    "ffmpeg": "^0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
     "jimp": "^0.22.10",
     "jpeg-js": "^0.4.4",
     "slug": "^8.2.2"
